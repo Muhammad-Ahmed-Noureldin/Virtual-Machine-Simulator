@@ -2,7 +2,7 @@
 ## Vole Machine Simulator
 
 **Faculty of Computers and Artificial Intelligence, Cairo University**  
-**Course:** CS213 - Programming II (First Semester, 2026/2027)  
+**Course:** CS213 - Object Oriented Programming (First Semester, 2026/2027)  
 **Instructor:** Dr. Mohammad El-Ramly  
 
 ---
