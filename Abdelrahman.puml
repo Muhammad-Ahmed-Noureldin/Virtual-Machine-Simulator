@@ -1,0 +1,97 @@
+@startuml
+class Memory {
+    + size: int
+    + cells: list[int]
+    + read(address: int): int
+    + write(address: int, value: int): void
+    + display_matrix(): void
+}
+
+class Registers {
+    + count: int
+    + cells: list[int]
+    + read(reg_index: int): int
+    + write(reg_index: int, value: int): void
+    + display(): void
+}
+
+class ProgramCounter {
+    + value: int
+    + set(address: int): void
+    + increment(step: int): void
+    + get(): int
+}
+
+class InstructionRegister {
+    + value: str
+    + set(hex_str: str): void
+    + get_opcode(): int
+    + get_r(): int
+    + get_s(): int
+    + get_t(): int
+    + get_xy(): int
+    + get_x(): int
+}
+
+class ALU {
+    + add_twos_complement(val1: int, val2: int): int
+    + add_floating_point(val1: int, val2: int): int
+    + bitwise_or(val1: int, val2: int): int
+    + bitwise_and(val1: int, val2: int): int
+    + bitwise_xor(val1: int, val2: int): int
+    + rotate_right(val: int, steps: int): int
+}
+
+class Screen {
+    + output_buffer: list[int]
+    + write(value: int): void
+    + display(): void
+    + clear(): void
+}
+
+class ControlUnit {
+    + halted: bool
+    + fetch(pc: ProgramCounter, ir: InstructionRegister, memory: Memory): void
+    + decode_and_execute(ir: InstructionRegister, registers: Registers, pc: ProgramCounter, alu: ALU, memory: Memory, screen: Screen): void
+    + step(pc: ProgramCounter, ir: InstructionRegister, registers: Registers, alu: ALU, memory: Memory, screen: Screen): void
+}
+
+class CPU {
+    + registers: Registers
+    + pc: ProgramCounter
+    + ir: InstructionRegister
+    + alu: ALU
+    + control_unit: ControlUnit
+    + step(memory: Memory, screen: Screen): void
+    + display_state(): void
+}
+
+class VoleMachine {
+    + memory: Memory
+    + cpu: CPU
+    + screen: Screen
+    + load_program_from_file(filepath: str, start_address: int): void
+    + display_state(): void
+}
+
+class SimulatorUI {
+    + machine: VoleMachine
+    + main_menu(): void
+    + handle_load_program(): bool
+    + handle_overwrite(): void
+    + run_execution_mode(): void
+}
+
+VoleMachine *-- Memory
+VoleMachine *-- CPU
+VoleMachine *-- Screen
+CPU *-- Registers
+CPU *-- ProgramCounter
+CPU *-- InstructionRegister
+CPU *-- ALU
+CPU *-- ControlUnit
+ControlUnit ..> Memory : reads/writes
+ControlUnit ..> ALU : uses
+ControlUnit ..> Screen : outputs to
+SimulatorUI --> VoleMachine
+@enduml
