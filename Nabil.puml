@@ -1,0 +1,154 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+enum Opcode <<enumeration>> {
+  LOAD_MEM = 0x1
+  LOAD_VAL = 0x2
+  STORE = 0x3
+  MOVE = 0x4
+  ADD_INT = 0x5
+  ADD_FLOAT = 0x6
+  OR = 0x7
+  AND = 0x8
+  XOR = 0x9
+  ROTATE = 0xA
+  JUMP = 0xB
+  HALT = 0xC
+}
+
+class Machine {
+  - cpu : CPU
+  - memory : Memory
+  - bus : Bus
+  - screen : Screen
+  - loader : ProgramLoader
+  + loadProgram(fileName : string) : bool
+  + run() : void
+  + step() : void
+  + displayStatus() : void
+}
+
+class CPU {
+  - registers : Register[16]
+  - programCounter : ProgramCounter
+  - instructionRegister : InstructionRegister
+  - alu : ALU
+  - controlUnit : ControlUnit
+  - halted : bool
+  - errorMessage : string
+  - stepCount : int
+  - maxSteps : int
+  + runCycle() : void
+  + isHalted() : bool
+  + halt() : void
+  + haltWithError(message : string) : void
+  + getErrorMessage() : string
+  + getStepCount() : int
+  + getRegister(index : int) : Register&
+}
+
+class ControlUnit {
+  + fetch() : void
+  + decode() : Instruction
+  + execute(inst : Instruction) : void
+  - isKnownOpcode(value : uint8_t) : bool
+  - isAligned(address : uint8_t) : bool
+}
+
+class ALU {
+  + add(a : uint8_t, b : uint8_t) : uint8_t
+  + addFloating(a : uint8_t, b : uint8_t) : uint8_t
+  + bitwiseOr(a : uint8_t, b : uint8_t) : uint8_t
+  + bitwiseAnd(a : uint8_t, b : uint8_t) : uint8_t
+  + bitwiseXor(a : uint8_t, b : uint8_t) : uint8_t
+  + rotateRight(value : uint8_t, steps : int) : uint8_t
+  - decodeFloat(bits : uint8_t) : float
+  - encodeFloat(value : float) : uint8_t
+}
+
+class Register {
+  - value : uint8_t
+  + getValue() : uint8_t
+  + setValue(v : uint8_t) : void
+}
+
+class ProgramCounter {
+  - address : uint8_t
+  + getAddress() : uint8_t
+  + setAddress(a : uint8_t) : void
+  + increment() : void
+}
+
+class Instruction {
+  - rawOpcode : uint8_t
+  - r : uint8_t
+  - x : uint8_t
+  - y : uint8_t
+  + {static} decode(raw : uint16_t) : Instruction
+  + getRawOpcode() : uint8_t
+  + getR() : uint8_t
+  + getX() : uint8_t
+  + getY() : uint8_t
+  + getXY() : uint8_t
+  + toHexString() : string
+}
+
+class InstructionRegister {
+  - raw : uint16_t
+  + setRaw(value : uint16_t) : void
+  + getRaw() : uint16_t
+}
+
+class Memory {
+  - cells : uint8_t[256]
+  + read(address : uint8_t) : uint8_t
+  + write(address : uint8_t, value : uint8_t) : void
+  + clear() : void
+}
+
+class Bus {
+  + read(address : uint8_t) : uint8_t
+  + write(address : uint8_t, value : uint8_t) : void
+}
+
+class Screen {
+  - output : string
+  + print(value : uint8_t) : void
+  + getOutput() : string
+  + clear() : void
+}
+
+class ProgramLoader {
+  - lastError : string
+  + load(fileName : string, memory : Memory&) : bool
+  + getLastError() : string
+  - isValidHex(text : string) : bool
+  - isValidInstruction(text : string) : bool
+}
+
+Machine *-- CPU
+Machine *-- Memory
+Machine *-- Bus
+Machine *-- Screen
+Machine *-- ProgramLoader
+
+CPU *-- "16" Register
+CPU *-- ProgramCounter
+CPU *-- InstructionRegister
+CPU *-- ALU
+CPU *-- ControlUnit
+
+ControlUnit ..> ProgramCounter : uses
+ControlUnit ..> InstructionRegister : uses
+ControlUnit ..> ALU : uses
+ControlUnit ..> Register : uses
+ControlUnit ..> Instruction : creates
+ControlUnit ..> CPU : calls haltWithError()
+Instruction ..> Opcode : compared with
+InstructionRegister ..> Instruction : decoded into
+
+CPU --> Bus : accesses memory via
+Bus --> Memory : reads / writes
+Bus --> Screen : writes to address 00
+ProgramLoader ..> Memory : fills
+@enduml
