@@ -1,0 +1,383 @@
+
+@startuml
+title Vole Machine Simulator - Validated OOP Design
+
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+'========================================
+' Validation and execution result
+'========================================
+
+class ValidationResult {
+    + valid : bool
+    + message : string
+
+    + success() : ValidationResult
+    + failure(message : string) : ValidationResult
+}
+
+class ExecutionResult {
+    + success : bool
+    + halted : bool
+    + message : string
+}
+
+'========================================
+' Memory
+'========================================
+
+class Memory {
+    - cells : uint8_t[256]
+    - capacity : static constexpr uint16_t = 256
+
+    + readByte(address : uint16_t) : uint8_t
+    + writeByte(address : uint16_t, value : uint8_t) : void
+
+    + readWord(address : uint16_t) : uint16_t
+    + writeWord(address : uint16_t, value : uint16_t) : void
+
+    + validateAddress(address : uint16_t) : ValidationResult
+    + validateRange(address : uint16_t,
+                    length : uint16_t) : ValidationResult
+
+    + writeBytes(address : uint16_t,
+                 bytes : vector<uint8_t>) : ValidationResult
+
+    + clear() : void
+    + getCells() : const uint8_t*
+}
+
+note right of Memory
+  Valid byte addresses:
+  00 through FF
+
+  A word access requires
+  two consecutive valid bytes.
+
+  validateRange checks:
+  address < 256
+  length <= 256 - address
+
+  No access may cross
+  the memory boundary.
+end note
+
+'========================================
+' Registers
+'========================================
+
+class RegisterFile {
+    - registers : uint8_t[16]
+    - pc : uint16_t
+    - ir : uint16_t
+
+    + getRegister(index : uint8_t) : uint8_t
+    + setRegister(index : uint8_t,
+                  value : uint8_t) : void
+
+    + validateRegisterIndex(index : uint8_t) : ValidationResult
+
+    + getPC() : uint16_t
+    + setPC(value : uint16_t) : void
+    + incrementPC(amount : uint16_t) : void
+
+    + getIR() : uint16_t
+    + setIR(value : uint16_t) : void
+
+    + clear() : void
+}
+
+note right of RegisterFile
+  PC uses uint16_t so it can
+  represent 0100 after the
+  final memory instruction.
+
+  ControlUnit validates PC
+  before fetching.
+end note
+
+'========================================
+' ALU
+'========================================
+
+class ALU {
+    + addInteger(s : uint8_t,
+                 t : uint8_t) : uint8_t
+
+    + addFloat(s : uint8_t,
+               t : uint8_t) : uint8_t
+
+    + bitwiseOr(s : uint8_t,
+                t : uint8_t) : uint8_t
+
+    + bitwiseAnd(s : uint8_t,
+                 t : uint8_t) : uint8_t
+
+    + bitwiseXor(s : uint8_t,
+                 t : uint8_t) : uint8_t
+
+    + rotateRight(value : uint8_t,
+                  count : uint8_t) : uint8_t
+}
+
+'========================================
+' Decoded instruction
+'========================================
+
+class Instruction {
+    + opcode : uint8_t
+    + r : uint8_t
+    + x : uint8_t
+    + y : uint8_t
+    + s : uint8_t
+    + t : uint8_t
+
+    + decode(rawWord : uint16_t) : Instruction
+
+    + validateEncoding(rawWord : uint16_t) : ValidationResult
+    + validateOperands() : ValidationResult
+}
+
+note right of Instruction
+  Validates opcode-specific
+  operand and reserved fields.
+
+  Examples:
+  40RS: reserved nibble = 0
+  AR0X: reserved nibble = 0
+  C000: all operand bits = 0
+end note
+
+'========================================
+' Control Unit
+'========================================
+
+class ControlUnit {
+    - halted : bool
+
+    + step(memory : Memory,
+           registers : RegisterFile,
+           alu : ALU,
+           screen : Screen) : ExecutionResult
+
+    + fetch(memory : Memory,
+            registers : RegisterFile) : uint16_t
+
+    + decode(rawWord : uint16_t) : Instruction
+
+    + validateInstruction(rawWord : uint16_t) : ValidationResult
+
+    + validateProgramCounter(pc : uint16_t) : ValidationResult
+
+    + execute(instruction : Instruction,
+              memory : Memory,
+              registers : RegisterFile,
+              alu : ALU,
+              screen : Screen) : void
+
+    + halt() : void
+    + isHalted() : bool
+    + reset() : void
+}
+
+note right of ControlUnit
+  Before execution:
+  1. Validate PC and fetch range.
+  2. Fetch the 16-bit word.
+  3. Validate its encoding.
+  4. Decode operands.
+  5. Execute only if valid.
+
+  Branch targets must be
+  valid, even instruction
+  addresses.
+end note
+
+'========================================
+' Screen
+'========================================
+
+class Screen {
+    - output : string
+
+    + write(value : uint8_t) : void
+    + display() : void
+    + clear() : void
+    + getOutput() : string
+}
+
+'========================================
+' Parser
+'========================================
+
+class Parser {
+    + parseLine(line : string) : vector<uint8_t>
+
+    + validateLine(line : string) : ValidationResult
+
+    + parseHexByte(token : string) : uint8_t
+
+    + validateHex(token : string,
+                  expectedLength : uint16_t) : ValidationResult
+
+    + validateOpcode(rawWord : uint16_t) : ValidationResult
+
+    + validateInstruction(rawWord : uint16_t) : ValidationResult
+}
+
+note right of Parser
+  Accepts a four-hex-digit
+  instruction per non-comment
+  program line.
+
+  Rejects:
+  - Invalid hex characters
+  - Incorrect instruction length
+  - Unsupported opcodes
+  - Invalid reserved fields
+
+  Returns two bytes per
+  valid instruction.
+end note
+
+'========================================
+' Program Loader
+'========================================
+
+class ProgramLoader {
+    - parser : Parser
+
+    + loadFile(path : string,
+               memory : Memory,
+               startAddress : uint16_t) : ValidationResult
+
+    + validateStartAddress(address : uint16_t) : ValidationResult
+
+    + validateProgramSize(startAddress : uint16_t,
+                          byteCount : uint16_t) : ValidationResult
+}
+
+note right of ProgramLoader
+  Loading procedure:
+  1. Validate even start address.
+  2. Parse entire file.
+  3. Validate all instructions.
+  4. Validate total memory range.
+  5. Write bytes only after
+     all checks succeed.
+
+  Prevents partial program
+  loading on validation errors.
+end note
+
+'========================================
+' Machine facade
+'========================================
+
+class Machine {
+    - memory : Memory
+    - registers : RegisterFile
+    - alu : ALU
+    - screen : Screen
+    - controlUnit : ControlUnit
+    - programLoader : ProgramLoader
+
+    + loadProgram(path : string,
+                  startAddress : uint16_t) : ValidationResult
+
+    + step() : ExecutionResult
+    + run() : ExecutionResult
+    + reset() : void
+    + isHalted() : bool
+
+    + getMemory() : Memory&
+    + getRegisters() : RegisterFile&
+    + getScreen() : Screen&
+}
+
+'========================================
+' CLI
+'========================================
+
+class CLI {
+    - machine : Machine
+
+    + showMenu() : void
+    + handleChoice(choice : int) : void
+
+    + runStepMode() : void
+    + runContinuousMode() : void
+
+    + displayState() : void
+    + editMemory() : void
+    + editRegister() : void
+
+    + validateHexInput(input : string,
+                       expectedLength : uint16_t) : ValidationResult
+
+    + validateStartAddress(address : uint16_t) : ValidationResult
+}
+
+note right of CLI
+  CLI validates user input
+  for clear error messages.
+
+  Machine, Parser, Loader,
+  and Memory repeat critical
+  checks independently.
+
+  CLI validation alone is
+  not a safety boundary.
+end note
+
+'========================================
+' Optional machine snapshot
+'========================================
+
+class MachineState {
+    + memorySnapshot : vector<uint8_t>
+    + registerSnapshot : vector<uint8_t>
+    + pcSnapshot : uint16_t
+    + irSnapshot : uint16_t
+    + screenSnapshot : string
+
+    + capture(machine : Machine) : void
+}
+
+'========================================
+' Relationships
+'========================================
+
+Machine *-- Memory
+Machine *-- RegisterFile
+Machine *-- ALU
+Machine *-- Screen
+Machine *-- ControlUnit
+Machine *-- ProgramLoader
+
+ControlUnit ..> Memory : fetch / load / store
+ControlUnit ..> RegisterFile : PC / IR / registers
+ControlUnit ..> ALU : arithmetic / logic
+ControlUnit ..> Screen : output
+ControlUnit ..> Instruction : decode / validate
+ControlUnit ..> ValidationResult
+ControlUnit ..> ExecutionResult
+
+ProgramLoader *-- Parser
+ProgramLoader ..> Memory : validated loading
+ProgramLoader ..> ValidationResult
+
+Parser ..> Instruction : validates encoding
+Parser ..> ValidationResult
+
+Memory ..> ValidationResult : bounds checks
+
+CLI --> Machine : commands / display
+CLI ..> ValidationResult : input feedback
+CLI ..> MachineState : optional snapshot
+
+MachineState ..> Machine : captures state
+
+@enduml
