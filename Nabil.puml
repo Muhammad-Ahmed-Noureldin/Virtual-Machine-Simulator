@@ -16,6 +16,15 @@ enum Opcode <<enumeration>> {
   HALT = 0xC
 }
 
+class ConsoleMenu {
+  - machine : Machine&
+  - running : bool
+  + start() : void
+  + showMenu() : void
+  + readChoice() : int
+  + handleChoice(choice : int) : void
+}
+
 class Machine {
   - cpu : CPU
   - memory : Memory
@@ -25,7 +34,9 @@ class Machine {
   + loadProgram(fileName : string) : bool
   + run() : void
   + step() : void
+  + reset() : void
   + displayStatus() : void
+  - handleError() : bool
 }
 
 class CPU {
@@ -36,13 +47,21 @@ class CPU {
   - controlUnit : ControlUnit
   - halted : bool
   - errorMessage : string
+  - errorAddress : uint8_t
+  - errorFixable : bool
+  - lastInstructionAddress : uint8_t
   - stepCount : int
   - maxSteps : int
   + runCycle() : void
+  + reset() : void
   + isHalted() : bool
   + halt() : void
-  + haltWithError(message : string) : void
+  + haltWithError(message : string, fixable : bool, fixAddress : uint8_t) : void
   + getErrorMessage() : string
+  + getErrorAddress() : uint8_t
+  + isErrorFixable() : bool
+  + clearError() : void
+  + setProgramCounter(address : uint8_t) : void
   + getStepCount() : int
   + getRegister(index : int) : Register&
 }
@@ -70,6 +89,7 @@ class Register {
   - value : uint8_t
   + getValue() : uint8_t
   + setValue(v : uint8_t) : void
+  + reset() : void
 }
 
 class ProgramCounter {
@@ -122,9 +142,11 @@ class ProgramLoader {
   - lastError : string
   + load(fileName : string, memory : Memory&) : bool
   + getLastError() : string
+  + isValidInstruction(text : string) : bool
   - isValidHex(text : string) : bool
-  - isValidInstruction(text : string) : bool
 }
+
+ConsoleMenu --> Machine : controls
 
 Machine *-- CPU
 Machine *-- Memory
