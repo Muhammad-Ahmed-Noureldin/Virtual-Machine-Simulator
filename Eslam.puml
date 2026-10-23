@@ -1,0 +1,140 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+class VoleMachine {
+  - cpu : CPU
+  - memory : Memory
+  - screen : Screen
+  - programLoader : ProgramLoader
+  + run() : void
+  + loadProgram(fileName : string, startAddress : int) : void
+  + step() : void
+  + runAll() : void
+  + displayState() : void
+}
+
+class CPU {
+  - pc : ProgramCounter
+  - ir : InstructionRegister
+  - registers : Register[16]
+  - controlUnit : ControlUnit
+  - alu : ALU
+  - halted : bool
+  + fetch() : void
+  + decode() : DecodedInstruction
+  + execute(decoded : DecodedInstruction) : void
+  + step() : void
+  + run() : void
+  + reset() : void
+  + getRegister(index : int) : Register
+}
+
+class ControlUnit {
+  + decode(word : Word) : DecodedInstruction
+  + validate(opcode : char, operands : string) : bool
+  + generateSignals(decoded : DecodedInstruction) : Signals
+  + incrementPC() : void
+  + setPC(address : int) : void
+}
+
+class ALU {
+  + addTwosComplement(a : Word, b : Word) : Word
+  + addFloatingPoint(a : Word, b : Word) : Word
+  + bitwiseOR(a : Word, b : Word) : Word
+  + bitwiseAND(a : Word, b : Word) : Word
+  + bitwiseXOR(a : Word, b : Word) : Word
+  + rotateRight(value : Word, times : int) : Word
+}
+
+class Memory {
+  - cells : Word[256]
+  + read(address : int) : Word
+  + write(address : int, value : Word) : void
+  + loadProgram(program : Program, startAddress : int) : void
+  + dump() : string
+}
+
+class Register {
+  - value : Word
+  + get() : Word
+  + set(value : Word) : void
+  + rotateRight(times : int) : void
+}
+
+class ProgramCounter {
+  - address : int
+  + get() : int
+  + set(address : int) : void
+  + increment() : void
+}
+
+class InstructionRegister {
+  - instruction : Word
+  + set(word : Word) : void
+  + get() : Word
+  + getOpcode() : char
+  + getOperandR() : int
+  + getOperandXY() : int
+}
+
+class Screen {
+  + write(address : int, value : Word) : void
+  + display() : void
+}
+
+class ProgramLoader {
+  + parseFile(fileName : string) : Program
+}
+
+class Program {
+  - instructions : List<Word>
+  - startAddress : int
+  + getInstructions() : List<Word>
+  + getStartAddress() : int
+}
+
+class DecodedInstruction {
+  - opcode : char
+  - operandR : int
+  - operandS : int
+  - operandT : int
+  - operandXY : int
+}
+
+class MachineCycle {
+  <<enumeration>>
+  FETCH
+  DECODE
+  EXECUTE
+}
+
+class Signals {
+  - registerWrite : bool
+  - memoryRead : bool
+  - memoryWrite : bool
+  - aluOperation : string
+  - pcUpdate : string
+}
+
+' Relationships
+VoleMachine *-- CPU
+VoleMachine *-- Memory
+VoleMachine *-- Screen
+VoleMachine *-- ProgramLoader
+
+CPU *-- ControlUnit
+CPU *-- ALU
+CPU *-- ProgramCounter
+CPU *-- InstructionRegister
+CPU *-- "16" Register
+
+CPU --> Memory : uses
+CPU --> MachineCycle : state
+ControlUnit --> DecodedInstruction : creates
+ControlUnit --> Signals : generates
+ProgramLoader --> Program : creates
+Program --> Memory : loaded into
+Screen --> Memory : mapped to FF
+
+@enduml
