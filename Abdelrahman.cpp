@@ -1,12 +1,12 @@
 #include <iostream>
 #include "Abdelrahman.h"
 
-programCounter::programCounter( int value )
+programCounter::programCounter( int Address )
 {
-    this->value=value;
+    this->Address=Address;
 }
 int programCounter::getInstructionAddress()
 {
-    value+=2;
-    return value-2;
+    Address+=2;
+    return Address-2;
 }

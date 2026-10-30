@@ -3,7 +3,7 @@
 class programCounter
 {
     private:
-    int value;
+    int Address;
     public:
     programCounter( int value );
 
