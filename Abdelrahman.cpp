@@ -1,6 +1,12 @@
 #include <iostream>
-using namespace std;
-class CPU
-{
+#include "Abdelrahman.h"
 
-};
+programCounter::programCounter( int value )
+{
+    this->value=value;
+}
+int programCounter::getInstructionAddress()
+{
+    value+=2;
+    return value-2;
+}
