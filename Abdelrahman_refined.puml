@@ -1,0 +1,132 @@
+@startuml
+class Memory {
+    - size: int
+    - cells: list[int]
+    + read(address: int): int
+    + write(address: int, value: int): void
+    + display_matrix(): void
+}
+
+class Registers {
+    - count: int
+    - cells: list[int]
+    + read(reg_index: int): int
+    + write(reg_index: int, value: int): void
+    + display(): void
+}
+
+class ProgramCounter {
+    - value: int
+    + set(address: int): void
+    + increment(step: int): void
+    + get(): int
+}
+
+class InstructionRegister {
+    - value: str
+    + set(hex_str: str): void
+    + get_opcode(): int
+    + get_r(): int
+    + get_s(): int
+    + get_t(): int
+    + get_xy(): int
+    + get_x(): int
+}
+
+class ALU {
+    + add_twos_complement(val1: int, val2: int): int
+    + add_floating_point(val1: int, val2: int): int
+    + bitwise_or(val1: int, val2: int): int
+    + bitwise_and(val1: int, val2: int): int
+    + bitwise_xor(val1: int, val2: int): int
+    + rotate_right(val: int, steps: int): int
+}
+
+class Screen {
+    - output_buffer: list[int]
+    + write(value: int): void
+    + display(): void
+    + clear(): void
+}
+
+class ControlUnit {
+    {static} - OP_LOAD_MEM: int = 0x1
+    {static} - OP_LOAD_VAL: int = 0x2
+    {static} - OP_STORE: int = 0x3
+    {static} - OP_MOVE: int = 0x4
+    {static} - OP_ADD_INT: int = 0x5
+    {static} - OP_ADD_FLOAT: int = 0x6
+    {static} - OP_OR: int = 0x7
+    {static} - OP_AND: int = 0x8
+    {static} - OP_XOR: int = 0x9
+    {static} - OP_ROTATE: int = 0xA
+    {static} - OP_JUMP: int = 0xB
+    {static} - OP_HALT: int = 0xC
+    - halted: bool
+    - pc: ProgramCounter
+    - ir: InstructionRegister
+    - registers: Registers
+    - alu: ALU
+    - memory: Memory
+    - screen: Screen
+    + is_halted(): bool
+    + fetch(): void
+    + decode_and_execute(): void
+    + step(): void
+}
+
+class CPU {
+    - registers: Registers
+    - pc: ProgramCounter
+    - ir: InstructionRegister
+    - alu: ALU
+    - control_unit: ControlUnit
+    + step(): void
+    + display_state(): void
+}
+
+class VoleMachine {
+    - memory: Memory
+    - cpu: CPU
+    - screen: Screen
+    + load_program_from_file(filepath: str, start_address: int): void
+    + display_state(): void
+}
+
+class SimulatorUI {
+    - machine: VoleMachine
+    + main_menu(): void
+    + handle_load_program(): bool
+    + handle_overwrite(): void
+    + run_execution_mode(): void
+}
+
+VoleMachine *-- Memory
+VoleMachine *-- CPU
+VoleMachine *-- Screen
+CPU *-- Registers
+CPU *-- ProgramCounter
+CPU *-- InstructionRegister
+CPU *-- ALU
+CPU *-- ControlUnit
+ControlUnit --> ProgramCounter : fetches / jumps
+ControlUnit --> InstructionRegister : decodes
+ControlUnit --> Registers : reads/writes
+ControlUnit --> ALU : uses
+ControlUnit --> Memory : reads/writes
+ControlUnit --> Screen : outputs to
+SimulatorUI --> VoleMachine
+
+note right of ControlUnit
+  STORE (op-code 3): if the target address is 0xFF,
+  call Screen.write(value) instead of Memory.write()
+  (memory-mapped screen).
+end note
+
+note bottom of VoleMachine
+  load_program_from_file() checks, before copying
+  anything into Memory, that every line is a valid
+  4-digit hexadecimal instruction and that the
+  program fits in memory from start_address.
+end note
+@enduml
