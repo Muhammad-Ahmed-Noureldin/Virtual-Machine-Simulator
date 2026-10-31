@@ -39,6 +39,6 @@ void registers::display()
     for(int i=0;i<count;i++)
     {
         cout << "  ";
-        cout << hex << setfill('0') << setw(2) << i << "          " << setw(2)<< cells[i] << '\n';
+        cout << hex << uppercase << setfill('0') << setw(2) << i << "          " << setw(2)<< cells[i] << '\n';
     }
 }
