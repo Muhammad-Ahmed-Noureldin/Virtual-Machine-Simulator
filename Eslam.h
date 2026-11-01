@@ -18,4 +18,18 @@ void write(int address,int val);
 void display_matrix();
 
 };
+
+class Screen
+{
+    private:
+    vector<int>output_buffer;
+    
+    public:
+    
+    void write(int val);
+
+    void display();
+
+    void clear();
+};
 #endif
