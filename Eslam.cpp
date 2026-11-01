@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <iomanip>
+#include <vector>
 using namespace std;
 
 Memory::Memory()
@@ -37,4 +38,26 @@ void Memory::display_matrix()
     cout<<"\t"<<dec<<cells[i]<<"\n"; 
     }
  
+}
+
+void Screen::write(int val)
+{
+    output_buffer.push_back(val);
+}
+
+void Screen::display()
+{
+    int x=output_buffer.size();
+    
+    for(int i=0;i<x;i++)
+        {
+      cout<<output_buffer[i]<<" ";
+        }
+    cout<<"\n";
+}
+
+void Screen::clear()
+{
+    if(!output_buffer.empty())
+        output_buffer.clear();
 }
