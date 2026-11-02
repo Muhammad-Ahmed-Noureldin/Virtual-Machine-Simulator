@@ -1,5 +1,7 @@
 #ifndef ESLAM_H
 #define ESLAM_H
+#include <vector>
+using namespace std;
 
 
 class Memory

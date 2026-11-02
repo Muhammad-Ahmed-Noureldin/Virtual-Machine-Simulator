@@ -7,12 +7,19 @@ using namespace std;
 class programCounter
 {
     private:
+    
     int Address;
-    public:
-    void setAddress( int Address );
 
-    int getInstructionAddress();
+
+    public:
+
+    void set( int Address );
+    int get();
+    void increment();
+
+
 };
+
 
 class registers
 {

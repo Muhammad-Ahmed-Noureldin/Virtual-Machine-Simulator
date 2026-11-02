@@ -4,15 +4,26 @@
 #include "Abdelrahman.h"
 using namespace std;
 
-void programCounter::setAddress( int Address )
+void programCounter::set( int Address )
 {
     this->Address=Address;
 }
-int programCounter::getInstructionAddress()
+
+int programCounter::get()
+{
+    return Address;
+}
+
+void programCounter::increment()
 {
     Address+=2;
-    return Address-2;
 }
+
+
+
+
+//------------------------------------------------------------------------
+
 
 registers::registers()
 {
@@ -36,9 +47,11 @@ void registers::display()
     cout << "************************\n";
     cout << "Address" << "      Value(Hexa)    \n";
     cout << "************************\n";
-    for(int i=0;i<count;i++)
+    for(int i=0 ; i<count ; i++)
     {
         cout << "  ";
         cout << hex << uppercase << setfill('0') << setw(2) << i << "          " << setw(2)<< cells[i] << '\n';
     }
+
+    cout << dec;
 }

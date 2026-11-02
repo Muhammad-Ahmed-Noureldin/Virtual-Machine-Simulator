@@ -14,10 +14,10 @@ int InstructionRegister::get_opcode()
    int x;
    x = value[0] - 30;
 
-   for (int i=0;i<4;i++)
-   {
-       x = (x*10)+(value[i+1]-30);
-   }
+//    for (int i=0;i<4;i++)
+//    {
+//        x = (x*10)+(value[i+1]-30);
+//    }
  
    return x;
 }

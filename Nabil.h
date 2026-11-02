@@ -1,6 +1,8 @@
 #ifndef _Nabil_HPP
 #define _Nabil_HPP
-// #include <string>
+#include <string>
+using namespace std;
+
 class InstructionRegister
 {
     private:
