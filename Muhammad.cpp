@@ -191,15 +191,19 @@ using namespace std;
         int xy = ir->get_xy();
         int x = ir->get_x();
 
-        if(opcode == 1){
+        if(opcode == OP_LOAD_MEM){
 
             int var = memory->read(xy);
             reg->write(r , var);
         }
-        else if(opcode == 2){
+
+
+        else if(opcode == OP_LOAD_VAL){
             reg->write(r , xy);
         }
-        else if(opcode == 3){
+
+
+        else if(opcode == OP_STORE){
             if(xy == 0xff){
                 screen->write(reg->read(r));
             }
@@ -207,32 +211,50 @@ using namespace std;
                 memory->write( xy , reg->read(r) );
             }
         }
-        else if(opcode == 4){
+
+
+        else if(opcode == OP_MOVE){
             reg->write(r , reg->read(s));
         }
-        else if(opcode == 5){
+
+
+        else if(opcode == OP_ADD_INT){
             reg->write(r, alu->add_twos_complement(reg->read(s) , reg->read(t)));
         }
-        else if(opcode == 6){
+
+
+        else if(opcode == OP_ADD_FLOAT){
             reg->write(r , alu->add_floating_point(reg->read(s) , reg->read(t)));
         }
-        else if(opcode == 7){
+
+
+        else if(opcode == OR){
             reg->write(r, alu->bitwise_or(reg->read(s) , reg->read(t)));
         }
-        else if(opcode == 8){
+
+
+        else if(opcode == AND){
             reg->write(r , alu->bitwise_and(reg->read(s) , reg->read(t)));
         }
-        else if(opcode == 9){
+
+
+        else if(opcode == XOR){
             reg->write(r , alu->bitwise_xor(reg->read(s) , reg->read(t)));
         }
-        else if(opcode == 0xA){
+
+
+        else if(opcode == ROTATE){
             reg->write(r , alu->rotate_right(reg->read(r) , x));
         }
-        else if(opcode == 0xB){
+
+
+        else if(opcode == JUMP){
             if(reg->read(r) == reg->read(0)){
                 pc->set(xy);
             }
         }
+
+        
         else{
             halted = true;
         }
