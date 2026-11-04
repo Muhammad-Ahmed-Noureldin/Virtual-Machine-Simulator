@@ -7,6 +7,7 @@ class InstructionRegister
 {
     private:
         string value;
+        int hexToInt(char num);
     public:
         void set(string hex_str);
         int get_opcode();
