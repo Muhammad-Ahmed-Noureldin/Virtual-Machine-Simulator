@@ -2,6 +2,9 @@
 #define ABDELRHMAN_HPP
 #include <iostream>
 #include <vector>
+#include "Muhammad.h"
+#include "Eslam.h"
+#include "Nabil.h"
 using namespace std;
 
 class programCounter
@@ -34,6 +37,21 @@ class registers
     void write(int index , int value);
 
     void display();
+
+};
+
+class voleMachine
+{
+    private:
+    Memory *memory;
+    CPU * cpu;
+    Screen * screen;
+    public:
+    voleMachine(Memory *memory, CPU * cpu ,Screen * screen);
+
+    void load_program_from_file(string filePath ,int address);
+    
+    void display_state();
 
 };
 #endif

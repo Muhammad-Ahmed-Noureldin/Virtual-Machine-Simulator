@@ -2,6 +2,9 @@
 #include <vector>
 #include <iomanip>
 #include "Abdelrahman.h"
+#include "Muhammad.h"
+#include "Eslam.h"
+#include "Nabil.h"
 using namespace std;
 
 void programCounter::set( int Address )
@@ -54,4 +57,24 @@ void registers::display()
     }
 
     cout << dec;
+}
+
+voleMachine::voleMachine(Memory *memory, CPU * cpu ,Screen * screen)
+{
+    this->memory=memory;
+    this->cpu=cpu;
+    this->screen=screen;
+}
+
+void voleMachine::load_program_from_file(string filePath ,int address)
+{
+
+}
+
+void voleMachine::display_state()
+{
+
+
+
+    
 }
