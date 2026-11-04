@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <iomanip>
 #include "Nabil.h"
 using namespace std;
 
@@ -17,15 +18,7 @@ void InstructionRegister::set(string hex_str)
 
 int InstructionRegister::get_opcode()
 {
-   int x;
-   x = hexToInt(value[0]);
-
-//    for (int i=0;i<4;i++)
-//    {
-//        x = (x*10)+(value[i+1]-30);
-//    }
- 
-   return x;
+   return hexToInt(value[0]);
 }
 
 int InstructionRegister::get_r()
@@ -87,4 +80,24 @@ int InstructionRegister::get_x()
         return hexToInt(value[3]);
     } 
     else return 0;
+}
+
+
+////-------------------------------------------------------------------------------------
+
+
+CPU::CPU(registers* Reg,programCounter* pc,InstructionRegister* ir,ALU* alu,CU* controlUnit)
+: Registers(Reg) , pc(pc) , ir(ir) , alu(alu) , controlUnit(controlUnit){}
+
+
+void CPU::step()
+{
+    controlUnit->step();
+}
+
+
+void CPU::display_state()
+{
+    cout << "PC = " << hex << setw(2) << uppercase << setfill('0') << pc->get() << "\n";
+    Registers->display();
 }
