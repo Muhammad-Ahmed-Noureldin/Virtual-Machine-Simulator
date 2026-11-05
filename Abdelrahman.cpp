@@ -73,10 +73,11 @@ void voleMachine::load_program_from_file(string filePath ,int address)
 {
     string textLine;
     ifstream fin(filePath);
-    while(fin >> textLine)
+    while(getline(fin,textLine))
     {
-        if(textLine[0]==';') continue;
-        string inst_string=textLine.substr(0,5);
+        int start=textLine.find_first_not_of(" \t");
+        if(start==string::npos || textLine[start]==';') continue;
+        string inst_string=textLine.substr(start,4);
         stringstream s;
         s << inst_string;
         int  inst_int;
