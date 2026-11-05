@@ -1,5 +1,7 @@
 #include "Muhammad.h"
 #include <iostream>
+#include <sstream>
+#include <iomanip>
 #include "Abdelrahman.h"
 #include "Eslam.h"
 #include "Nabil.h"
@@ -161,31 +163,18 @@ using namespace std;
     void CU::fetch(){
 
         int address = pc->get(); 
-        int val1 = memory->read(address);
+        int val1 = memory->read(address);   //0x1f -->0001 1111 --> 31
         int val2 = memory->read(address+1); ///0x04 -->4
+
+
 
         pc->increment();
 
-        string instruction1 = "";
-        string instruction2 = "";
-        string instruction = "";
+        stringstream ss;
 
+        ss << uppercase << hex << setfill('0') << setw(2) << val1 << setw(2) << val2 ;
 
-        if(to_string(val2).length() == 1){
-            instruction2 += "0";
-        }
-
-        instruction1 += to_string(val1);
-        instruction2 += to_string(val2); // 4 --> "04"
-
-        if(to_string(val1).length() == 1){
-            instruction1 += "0";
-        }
-
-
-        instruction += (instruction1 + instruction2);
-  
-        ir->set(instruction);
+        ir->set(ss.str());
     }
 
     void CU::decode_and_execute(){
