@@ -1,12 +1,15 @@
 #include <iostream>
-#include <vector>
 #include <iomanip>
-#include "Abdelrahman.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <bitset>
+#include <cstdint>
+
 #include "Muhammad.h"
 #include "Eslam.h"
 #include "Nabil.h"
-using namespace std;
-
+#include "Abdelrahman.h"
 void programCounter::set( int Address )
 {
     this->Address=Address;
@@ -68,7 +71,24 @@ voleMachine::voleMachine(Memory *memory, CPU * cpu ,Screen * screen)
 
 void voleMachine::load_program_from_file(string filePath ,int address)
 {
-
+    string textLine;
+    ifstream fin(filePath);
+    while(fin >> textLine)
+    {
+        if(textLine[0]==';') continue;
+        string inst_string=textLine.substr(0,5);
+        stringstream s;
+        s << inst_string;
+        int  inst_int;
+        s >> hex >> inst_int;
+        uint16_t valu1= inst_int>>8;
+        memory->write(address,valu1);
+        address++;
+        uint16_t valu2 =inst_int<<8;
+        valu2 = valu2 >> 8;
+        memory->write(address,valu2);
+        address++;
+    }
 }
 
 void voleMachine::display_state()
@@ -76,5 +96,5 @@ void voleMachine::display_state()
 
 
 
-    
+
 }

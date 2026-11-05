@@ -1,10 +1,10 @@
 #ifndef ABDELRHMAN_HPP
 #define ABDELRHMAN_HPP
-#include <iostream>
+class CPU;
+class Screen;
+class Memory;
 #include <vector>
-#include "Muhammad.h"
-#include "Eslam.h"
-#include "Nabil.h"
+
 using namespace std;
 
 class programCounter
@@ -50,7 +50,7 @@ class voleMachine
     voleMachine(Memory *memory, CPU * cpu ,Screen * screen);
 
     void load_program_from_file(string filePath ,int address);
-    
+
     void display_state();
 
 };

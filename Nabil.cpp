@@ -1,7 +1,11 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
+
+#include "Muhammad.h"
+#include "Eslam.h"
 #include "Nabil.h"
+#include "Abdelrahman.h"
 using namespace std;
 
 int InstructionRegister::hexToInt(char num)
@@ -87,7 +91,7 @@ int InstructionRegister::get_x()
 
 
 CPU::CPU(registers* Reg,programCounter* pc,InstructionRegister* ir,ALU* alu,CU* controlUnit)
-: Registers(Reg) , pc(pc) , ir(ir) , alu(alu) , controlUnit(controlUnit){}
+ : Registers(Reg) , pc(pc) , ir(ir) , alu(alu) , controlUnit(controlUnit){}
 
 
 void CPU::step()

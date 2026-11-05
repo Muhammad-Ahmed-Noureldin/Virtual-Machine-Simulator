@@ -1,9 +1,6 @@
 #ifndef _Nabil_HPP
 #define _Nabil_HPP
 
-#include "Muhammad.h"
-#include "Eslam.h"
-#include "Abdelrahman.h"
 #include <string>
 
 class InstructionRegister

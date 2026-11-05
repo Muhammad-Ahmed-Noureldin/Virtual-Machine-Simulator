@@ -1,8 +1,12 @@
-#include "Eslam.h"
 #include <iostream>
 #include <cstdlib>
 #include <iomanip>
 #include <vector>
+
+#include "Muhammad.h"
+#include "Eslam.h"
+#include "Nabil.h"
+#include "Abdelrahman.h"
 using namespace std;
 
 Memory::Memory()
@@ -35,7 +39,8 @@ void Memory::display_matrix()
     for(int i=0;i<size;i++)
     {
     cout<<"\t0x"<<uppercase<<hex<<setfill('0')<<setw(2)<<i;
-    cout<<"\t"<<dec<<cells[i]<<"\n"; 
+    cout<<"\t"<<hex<<cells[i]<<"\n"; 
+    cout <<dec;
     }
  
 }

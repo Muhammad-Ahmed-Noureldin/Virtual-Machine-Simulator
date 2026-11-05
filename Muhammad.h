@@ -1,10 +1,10 @@
 #ifndef MUHAMMAD_H
 #define MUHAMMAD_H
-
-#include "Abdelrahman.h"
-#include "Eslam.h"
-#include "Nabil.h"
-
+class InstructionRegister;
+class programCounter;
+class  Memory;
+class  registers;
+class  Screen;
 
 class ALU{
 

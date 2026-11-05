@@ -1,5 +1,8 @@
 #include "Muhammad.h"
 #include <iostream>
+#include "Abdelrahman.h"
+#include "Eslam.h"
+#include "Nabil.h"
 using namespace std;
 #include <cmath>
 
