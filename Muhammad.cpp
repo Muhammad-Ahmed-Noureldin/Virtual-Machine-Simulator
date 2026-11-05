@@ -7,6 +7,7 @@ using namespace std;
 #include <cmath>
 
 
+
     float ALU::decode(int val){
 
         float sign = (val >> 7 )& 0x01;
@@ -159,9 +160,9 @@ using namespace std;
 
     void CU::fetch(){
 
-        int address = pc->get();
+        int address = pc->get(); 
         int val1 = memory->read(address);
-        int val2 = memory->read(address+1);
+        int val2 = memory->read(address+1); ///0x04 -->4
 
         pc->increment();
 
@@ -169,16 +170,18 @@ using namespace std;
         string instruction2 = "";
         string instruction = "";
 
-        if(to_string(val1).length() == 1){
-            instruction1 += "0";
-        }
 
         if(to_string(val2).length() == 1){
             instruction2 += "0";
         }
 
         instruction1 += to_string(val1);
-        instruction2 += to_string(val2);
+        instruction2 += to_string(val2); // 4 --> "04"
+
+        if(to_string(val1).length() == 1){
+            instruction1 += "0";
+        }
+
 
         instruction += (instruction1 + instruction2);
   
