@@ -5,6 +5,7 @@
 #include <sstream>
 #include <bitset>
 #include <cstdint>
+#include <cstdlib>
 
 #include "Muhammad.h"
 #include "Eslam.h"
@@ -44,6 +45,10 @@ int registers::read(int index)
 
 void registers::write(int index , int value)
 {
+    if(index >=0x10 || index<0)
+    {
+        exit(-1);
+    }
     cells[index]=value;
 }
 
