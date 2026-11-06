@@ -40,6 +40,10 @@ registers::registers()
 
 int registers::read(int index)
 {
+    if(index >=0x10 || index<0)
+    {
+        exit(EXIT_FAILURE);
+    }
     return cells[index];
 } 
 
@@ -47,7 +51,7 @@ void registers::write(int index , int value)
 {
     if(index >=0x10 || index<0)
     {
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
     cells[index]=value;
 }
