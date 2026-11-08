@@ -1,0 +1,52 @@
+; ------------------------------------------------------------
+; Test1.txt : Fibonacci Sequence Generator
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Generates the first 12 Fibonacci numbers (F0 .. F11) using a
+;  counted loop and prints each one to the screen as soon as it
+;  is produced. While looping it also keeps a running total of
+;  all the numbers printed. When the loop ends, the total and the
+;  next Fibonacci number (F12) are saved into memory cells 80 and
+;  81, loaded back into different registers, and printed. This
+;  exercises LOAD, STORE, MOVE, ADD, JUMP and the screen (FF).
+;
+;  Register usage:
+;   R0 = 0 (zero register, jump tests compare against it)
+;   R1 = a (current Fibonacci number)   R2 = b (the next one)
+;   R3 = loop counter (counts down from 12 to 0)
+;   R4 = FF (adding it subtracts 1)     R5 = temporary (a + b)
+;   R6 = running sum                    R7, R8 = reload registers
+; ------------------------------------------------------------
+
+2000   ; R0 = 0
+2100   ; R1 = 0  (F0)
+2201   ; R2 = 1  (F1)
+230C   ; R3 = 12 (loop counter)
+24FF   ; R4 = FF (-1)
+2600   ; R6 = 0  (sum)
+31FF   ; LOOP: print R1 to screen
+5661   ; R6 = R6 + R1
+5512   ; R5 = R1 + R2
+4021   ; R1 = R2
+4052   ; R2 = R5
+5334   ; R3 = R3 - 1
+B31C   ; if R3 == 0 jump to 1C (after loop)
+B00C   ; jump back to LOOP (0C)
+3680   ; mem[80] = sum
+3181   ; mem[81] = R1 (F12)
+1780   ; R7 = mem[80]
+1881   ; R8 = mem[81]
+37FF   ; print R7
+38FF   ; print R8
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal (as printed by the simulator):
+;    0 1 1 2 3 5 8 13 21 34 55 89 232 144
+;  Hex of the same values:
+;    00 01 01 02 03 05 08 0D 15 22 37 59 E8 90
+;  Meaning: F0..F11, then the sum of those 12 numbers (232),
+;  then F12 (144).
+;  Final memory: mem[80] = E8, mem[81] = 90
+; ------------------------------------------------------------

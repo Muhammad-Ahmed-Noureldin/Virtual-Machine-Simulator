@@ -1,0 +1,46 @@
+; ------------------------------------------------------------
+; Test7.txt : Sum of Even and Odd Numbers from 1 to 20
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Counts i from 1 to 20. For every i it tests the parity with
+;  AND 01. If the result is zero the number is even and is added
+;  to the even total, otherwise it is added to the odd total.
+;  After the loop it prints the even total, the odd total and
+;  the grand total of both. This demonstrates a two-way branch
+;  built from a conditional jump plus an unconditional jump.
+;
+;  Register usage:
+;   R0 = 0 (zero register)   R1 = i (counts up)
+;   R2 = sum of even numbers R3 = sum of odd numbers
+;   R4 = 01                  R5 = remaining iterations (20)
+;   R6 = FF (-1)             R7 = parity test result
+; ------------------------------------------------------------
+
+2000   ; R0 = 0
+2100   ; R1 = 0
+2200   ; R2 = 0
+2300   ; R3 = 0
+2401   ; R4 = 1
+2514   ; R5 = 20
+26FF   ; R6 = FF (-1)
+5114   ; LOOP: i = i + 1
+8714   ; R7 = i AND 1
+B718   ; if R7 == 0 (even) jump to EVEN (18)
+5331   ; ODD: odd sum = odd sum + i
+B01A   ; jump to NEXT (1A)
+5221   ; EVEN: even sum = even sum + i
+5556   ; NEXT: R5 = R5 - 1
+B520   ; if R5 == 0 jump to END (20)
+B00E   ; jump back to LOOP (0E)
+32FF   ; END: print even sum
+33FF   ; print odd sum
+5423   ; R4 = even sum + odd sum
+34FF   ; print grand total
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal: 110 100 210
+;  Hex:     6E 64 D2
+;  Meaning: 2+4+...+20 = 110, 1+3+...+19 = 100, total 1..20 = 210
+; ------------------------------------------------------------

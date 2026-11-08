@@ -100,11 +100,3 @@ void voleMachine::load_program_from_file(string filePath ,int address)
         address++;
     }
 }
-
-void voleMachine::display_state()
-{
-
-
-
-
-}

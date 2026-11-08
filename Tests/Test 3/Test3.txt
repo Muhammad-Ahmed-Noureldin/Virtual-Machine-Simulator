@@ -1,0 +1,59 @@
+; ------------------------------------------------------------
+; Test3.txt : Bit Manipulation Toolkit
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Takes one byte, B5 (binary 1011 0101), and applies the logic
+;  and rotate instructions to it, printing every result:
+;   1. AND with 0F  -> keeps the low nibble
+;   2. AND with F0  -> keeps the high nibble
+;   3. OR  with 0F  -> forces the low nibble to all ones
+;   4. XOR with FF  -> bitwise NOT (flips every bit)
+;   5. ROTATE right by 4 -> swaps the two nibbles
+;   6. ROTATE right by 1 -> circular shift, low bit wraps to top
+;  Then it shows two's complement arithmetic:
+;   7. C8 + 64 (200 + 100) wraps around the 8-bit register
+;   8. Negation of 05 using NOT then +1 (two's complement)
+;
+;  Register usage:
+;   R1 = B5 (the value)  R2 = 0F  R3 = F0  R4 = FF  R5 = 01
+;   R6..R9 = results     R0, RA = operands for the wrap-around add
+;   RB, RC, RD, RE = scratch for the add / negation demos
+; ------------------------------------------------------------
+
+21B5   ; R1 = B5
+220F   ; R2 = 0F
+23F0   ; R3 = F0
+24FF   ; R4 = FF
+2501   ; R5 = 01
+8612   ; R6 = R1 AND R2
+36FF   ; print R6
+8713   ; R7 = R1 AND R3
+37FF   ; print R7
+7812   ; R8 = R1 OR R2
+38FF   ; print R8
+9914   ; R9 = R1 XOR R4
+39FF   ; print R9
+4016   ; R6 = R1 (copy value)
+A604   ; rotate R6 right 4 times
+36FF   ; print R6
+4016   ; R6 = R1 (copy value again)
+A601   ; rotate R6 right once
+36FF   ; print R6
+20C8   ; R0 = C8 (200)
+2A64   ; RA = 64 (100)
+5B0A   ; RB = R0 + RA (wraps around)
+3BFF   ; print RB
+2C05   ; RC = 05
+9DC4   ; RD = RC XOR R4
+5ED5   ; RE = RD + R5  (two's complement of 5)
+3EFF   ; print RE
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal: 5 176 191 74 91 218 44 251
+;  Hex:     05 B0 BF 4A 5B DA 2C FB
+;  Meaning: B5 AND 0F, B5 AND F0, B5 OR 0F, B5 XOR FF,
+;           B5 rotated right 4 (5B), B5 rotated right 1 (DA),
+;           C8 + 64 = 12C wrapped to 2C, and -5 = FB.
+; ------------------------------------------------------------

@@ -1,0 +1,53 @@
+; ------------------------------------------------------------
+; Test10.txt : Maximum of Three Numbers
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Finds the largest of three numbers (37, 91, 64). It prints
+;  the three inputs first, then compares them one at a time with
+;  the current maximum and prints the winner. There is no
+;  greater-than instruction, so "v >= max" is tested by computing
+;  v - max (adding the two's complement of max) and checking the
+;  sign bit with AND 80: sign bit clear means v >= max, and the
+;  maximum is replaced with v. All inputs must be below 128 for
+;  the sign test to be valid.
+;
+;  Register usage:
+;   R0 = 0 (zero register)  R1 = current maximum (starts as v1)
+;   R2 = v2   R3 = v3   R4 = FF   R5 = 01   R6 = 80 (sign mask)
+;   R7 = negated maximum    R8 = difference   R9 = sign bit
+; ------------------------------------------------------------
+
+2000   ; R0 = 0
+2125   ; R1 = 25 (37)
+225B   ; R2 = 5B (91)
+2340   ; R3 = 40 (64)
+24FF   ; R4 = FF
+2501   ; R5 = 01
+2680   ; R6 = 80
+31FF   ; print v1
+32FF   ; print v2
+33FF   ; print v3
+9714   ; R7 = NOT max
+5775   ; R7 = -max
+5827   ; R8 = v2 - max
+8986   ; R9 = sign bit of R8
+B920   ; if sign clear (v2 >= max) jump to UPD2 (20)
+B022   ; jump to CMP3 (22)
+4021   ; UPD2: max = v2
+9714   ; CMP3: R7 = NOT max
+5775   ; R7 = -max
+5837   ; R8 = v3 - max
+8986   ; R9 = sign bit of R8
+B92E   ; if sign clear (v3 >= max) jump to UPD3 (2E)
+B030   ; jump to PRINT (30)
+4031   ; UPD3: max = v3
+31FF   ; PRINT: print the maximum
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal: 37 91 64 91
+;  Hex:     25 5B 40 5B
+;  Meaning: the three inputs, then the maximum (91).
+;  Final registers: R1 = 5B
+; ------------------------------------------------------------

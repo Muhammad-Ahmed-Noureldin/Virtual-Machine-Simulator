@@ -1,0 +1,50 @@
+; ------------------------------------------------------------
+; Test5.txt : Collatz (3n+1) Sequence for n = 7
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Starts with n = 7 and repeatedly applies the Collatz rule
+;  until n reaches 1:
+;     if n is even  ->  n = n / 2
+;     if n is odd   ->  n = 3n + 1
+;  Every value of n is printed, and a step counter is printed at
+;  the end. The Vole machine cannot divide, so halving is done
+;  with ROTATE right by 1 followed by AND 7F (which clears the bit
+;  that wrapped around to the top). Parity is tested with
+;  AND 01. n == 1 is detected by computing n - 1 and testing for
+;  zero. 3n+1 is built from additions.
+;
+;  Register usage:
+;   R0 = 0 (zero register)   R1 = n         R2 = 01
+;   R3 = FF (-1)             R4 = scratch   R5 = 7F (mask)
+;   R6 = step counter        R7 = scratch (2n)
+; ------------------------------------------------------------
+
+2000   ; R0 = 0
+2107   ; R1 = 7 (n)
+2201   ; R2 = 1
+23FF   ; R3 = FF (-1)
+257F   ; R5 = 7F
+2600   ; R6 = 0 (steps)
+31FF   ; LOOP: print n
+5413   ; R4 = n - 1
+B426   ; if R4 == 0 (n is 1) jump to END (26)
+8412   ; R4 = n AND 1
+B41E   ; if R4 == 0 (even) jump to EVEN (1E)
+5711   ; ODD: R7 = n + n
+5171   ; R1 = R7 + n  (3n)
+5112   ; R1 = R1 + 1  (3n + 1)
+B022   ; jump to STEP (22)
+A101   ; EVEN: rotate R1 right 1
+8115   ; R1 = R1 AND 7F  (n / 2)
+5662   ; STEP: steps = steps + 1
+B00C   ; jump back to LOOP (0C)
+36FF   ; END: print step count
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal: 7 22 11 34 17 52 26 13 40 20 10 5 16 8 4 2 1 16
+;  Hex:     07 16 0B 22 11 34 1A 0D 28 14 0A 05 10 08 04 02 01 10
+;  Meaning: the 17 numbers of the sequence from 7 down to 1,
+;           followed by the number of steps taken (16).
+; ------------------------------------------------------------

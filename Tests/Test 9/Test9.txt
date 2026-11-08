@@ -1,0 +1,57 @@
+; ------------------------------------------------------------
+; Test9.txt : Array Sum with a Self-Modifying Load
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Vole has no indexed addressing, so to loop over an array this
+;  program rewrites its own LOAD instruction. It first stores five
+;  numbers (8, 15, 23, 4, 30) in memory cells 80..84. Then a loop
+;  executes the instruction 1180 located at address 20 ("load R1
+;  from mem[80]"). After each pass the loop writes the next array
+;  address (81, 82, ...) into the second byte of that instruction
+;  (address 21), so the next pass loads the next element. Each
+;  loaded value is added to a running sum. After five passes the
+;  sum is printed.
+;  NOTE: the program must be loaded at address 00, because the
+;  store at address 21 targets the load instruction directly.
+;
+;  Register usage:
+;   R0 = 0 (zero register)  R1 = element just loaded
+;   R2 = running sum        R3 = next array address (low byte)
+;   R4 = 01                 R5 = remaining elements (5)
+;   R6 = FF (-1)            R7 = scratch used to fill the array
+; ------------------------------------------------------------
+
+2000   ; R0 = 0
+2200   ; R2 = 0 (sum)
+2381   ; R3 = 81 (address for the 2nd element)
+2401   ; R4 = 01
+2505   ; R5 = 05
+26FF   ; R6 = FF (-1)
+2708   ; R7 = 08
+3780   ; mem[80] = 8
+270F   ; R7 = 0F
+3781   ; mem[81] = 15
+2717   ; R7 = 17
+3782   ; mem[82] = 23
+2704   ; R7 = 04
+3783   ; mem[83] = 4
+271E   ; R7 = 1E
+3784   ; mem[84] = 30
+1180   ; LOOP (addr 20): R1 = mem[XX] - the XX byte is rewritten
+5221   ; sum = sum + R1
+3321   ; mem[21] = R3 (modifies the LOAD above)
+5334   ; R3 = R3 + 1
+5556   ; R5 = R5 - 1
+B52E   ; if R5 == 0 jump to END (2E)
+B020   ; jump back to LOOP (20)
+32FF   ; END: print the sum
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal: 80
+;  Hex:     50
+;  Meaning: 8 + 15 + 23 + 4 + 30 = 80
+;  Final state: the instruction at address 20 reads 1185 (it was
+;  rewritten 5 times); mem[80..84] = 08 0F 17 04 1E
+; ------------------------------------------------------------

@@ -209,7 +209,7 @@ using namespace std;
 
 
         else if(opcode == OP_MOVE){
-            reg->write(r , reg->read(s));
+            reg->write(s , reg->read(r));
         }
 
 

@@ -51,7 +51,6 @@ class voleMachine
 
     void load_program_from_file(string filePath ,int address);
 
-    void display_state();
 
 };
 #endif

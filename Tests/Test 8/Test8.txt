@@ -1,0 +1,50 @@
+; ------------------------------------------------------------
+; Test8.txt : Reverse an Array in Memory
+; ------------------------------------------------------------
+; WHAT THIS PROGRAM DOES (load it at address 00):
+;  Builds an array of four values (10, 20, 30, 40) in memory
+;  cells 80..83, copies it in reverse order into cells 90..93
+;  (so 80 -> 93, 81 -> 92, 82 -> 91, 83 -> 90), and then reads the
+;  reversed array back from memory and prints it. This tests
+;  LOAD from memory, STORE to memory, immediate loads, and that
+;  program data does not collide with the program itself.
+;
+;  Register usage:
+;   R1 = value used to fill the source array
+;   R2 = temporary used during the copy
+;   R3 = value read back for printing
+; ------------------------------------------------------------
+
+210A   ; R1 = 0A (10)
+3180   ; mem[80] = 10
+2114   ; R1 = 14 (20)
+3181   ; mem[81] = 20
+211E   ; R1 = 1E (30)
+3182   ; mem[82] = 30
+2128   ; R1 = 28 (40)
+3183   ; mem[83] = 40
+1280   ; R2 = mem[80]
+3293   ; mem[93] = R2
+1281   ; R2 = mem[81]
+3292   ; mem[92] = R2
+1282   ; R2 = mem[82]
+3291   ; mem[91] = R2
+1283   ; R2 = mem[83]
+3290   ; mem[90] = R2
+1390   ; R3 = mem[90]
+33FF   ; print R3
+1391   ; R3 = mem[91]
+33FF   ; print R3
+1392   ; R3 = mem[92]
+33FF   ; print R3
+1393   ; R3 = mem[93]
+33FF   ; print R3
+C000   ; halt
+
+; ------------------------------------------------------------
+; EXPECTED OUTPUT (screen, in order)
+;  Decimal: 40 30 20 10
+;  Hex:     28 1E 14 0A
+;  Final memory: 80..83 = 0A 14 1E 28 (original array)
+;                90..93 = 28 1E 14 0A (reversed array)
+; ------------------------------------------------------------
